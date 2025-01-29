@@ -1,13 +1,29 @@
 import { CameraControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Fragment, useRef } from "react";
-import Polygon from "./Polygon";
-import { Vector3 } from "three";
+import Actor from "./Actor";
+import * as THREE from 'three'
+import Block from "./Block";
+
+const block = {
+  height: 3,
+};
+
+const testMap = {
+  blocks: [
+    [[block, block, block], [], []],
+    [[block, block, block], [], []],
+    [[block, block, block], [], []],
+  ],
+};
+
+console.log(JSON.stringify(testMap));
 
 const Scene = () => {
   const cameraControls = useRef<CameraControls>(null);
   const [, get] = useKeyboardControls();
-  
+  const ref = useRef()
+
   useFrame(() => {
     if (cameraControls.current) {
       if (get().forward) {
@@ -38,16 +54,19 @@ const Scene = () => {
       />
       <pointLight position={[0, 10, 0]} decay={0.3} intensity={0.5} />
 
-      <Polygon startingPosition={new Vector3(1, 1, 1)} size={[1, 1, 1]} msg="blarpo" />
-      <Polygon startingPosition={new Vector3(2, 1, 1)} size={[1, 1, 1]} />
-      <Polygon startingPosition={new Vector3(2, 1, 2)} size={[1, 1, 1]} />
-      <Polygon startingPosition={new Vector3(1, 1, 2)} size={[1, 1, 1]} />
-      <Polygon startingPosition={new Vector3(1, 1, 3)} size={[1, 1, 1]} />
-      <Polygon startingPosition={new Vector3(1, 1.66, 3)} size={[1, 0.33, 1]} />
-      <Polygon startingPosition={new Vector3(2, 1, 3)} size={[1, 1, 1]} />
+      {testMap.blocks.map((arrayx, ix) =>
+        arrayx.map((arrayy, iy) =>
+          arrayy.map((block, iz) => (
+            <Block
+              key={`${ix}${iy}${iz}`}
+              startingPosition={new THREE.Vector3(ix, iy, iz)}
+              height={block.height}
+            />
+          ))
+        )
+      )}
 
-
-
+      <Actor />
     </Fragment>
   );
 };
