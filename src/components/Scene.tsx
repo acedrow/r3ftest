@@ -1,9 +1,11 @@
 import { CameraControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Fragment, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Actor from "./Actor";
 import * as THREE from "three";
 import Block from "./Block";
+
+const GAMEPIECE_MODE_Y_ANGLE = 3;
 
 const block = {
   height: 3,
@@ -42,11 +44,32 @@ const testMap = {
   },
 };
 
-console.log(JSON.stringify(testMap));
-
 const Scene = () => {
   const cameraControls = useRef<CameraControls>(null);
+  const [showActorGamepiece, setShowActorGamepiece] = useState(false);
+  //checks camera twice per second to switch actors into game piece mode,
+  // not an ideal solution but best I can do :/
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        !showActorGamepiece &&
+        cameraControls?.current?.camera?.position?.y &&
+        cameraControls.current.camera.position?.y >= GAMEPIECE_MODE_Y_ANGLE
+      ) {
+        setShowActorGamepiece(true);
+      } else if (
+        showActorGamepiece &&
+        cameraControls?.current?.camera?.position?.y &&
+        cameraControls.current.camera.position?.y < GAMEPIECE_MODE_Y_ANGLE
+      ) {
+        setShowActorGamepiece(false);
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [showActorGamepiece]);
+
   const [, get] = useKeyboardControls();
+  useFrame(() => {});
 
   useFrame(() => {
     if (cameraControls.current) {
@@ -90,7 +113,10 @@ const Scene = () => {
         <meshBasicMaterial color={"red"} />
       </mesh>
 
-      <Actor startingPosition={new THREE.Vector3(1, 1.5, 1)} />
+      <Actor
+        startingPosition={new THREE.Vector3(1, 1.5, 1)}
+        showGamepiece={showActorGamepiece}
+      />
     </Fragment>
   );
 };
