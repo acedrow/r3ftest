@@ -5,7 +5,7 @@ import Actor from "./Actor";
 import * as THREE from "three";
 import Block from "./Block";
 
-const GAMEPIECE_MODE_Y_ANGLE = 3;
+const GAMEPIECE_MODE_POLAR_ANGLE = 0.3;
 
 const block = {
   height: 3,
@@ -53,14 +53,14 @@ const Scene = () => {
     const interval = setInterval(() => {
       if (
         !showActorGamepiece &&
-        cameraControls?.current?.camera?.position?.y &&
-        cameraControls.current.camera.position?.y >= GAMEPIECE_MODE_Y_ANGLE
+        cameraControls?.current?.polarAngle &&
+        cameraControls.current.polarAngle < GAMEPIECE_MODE_POLAR_ANGLE
       ) {
         setShowActorGamepiece(true);
       } else if (
         showActorGamepiece &&
-        cameraControls?.current?.camera?.position?.y &&
-        cameraControls.current.camera.position?.y < GAMEPIECE_MODE_Y_ANGLE
+        cameraControls?.current?.polarAngle &&
+        cameraControls.current.polarAngle >= GAMEPIECE_MODE_POLAR_ANGLE
       ) {
         setShowActorGamepiece(false);
       }
@@ -69,9 +69,10 @@ const Scene = () => {
   }, [showActorGamepiece]);
 
   const [, get] = useKeyboardControls();
-  useFrame(() => {});
+
 
   useFrame(() => {
+   
     if (cameraControls.current) {
       if (get().forward) {
         cameraControls.current.truck(0, -0.3, true);
