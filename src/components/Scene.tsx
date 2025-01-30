@@ -2,7 +2,7 @@ import { CameraControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Fragment, useRef } from "react";
 import Actor from "./Actor";
-import * as THREE from 'three'
+import * as THREE from "three";
 import Block from "./Block";
 
 const block = {
@@ -11,10 +11,35 @@ const block = {
 
 const testMap = {
   blocks: [
-    [[block, block, block], [], []],
-    [[block, block, block], [], []],
-    [[block, block, block], [], []],
+    [[block, block, block, block, block], [], [], [], []],
+    [[block, block, block, block, block], [], [], [], []],
+    [[block, block, block, block, block], [], [], [], []],
+    [[block, block, block, block, block], [], [], [], []],
+    [[block, block, block, block, block], [], [], [], []],
   ],
+  edges: {
+    x: [
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+    ],
+    y: [
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+    ],
+    z: [
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+      [[], [], [], [], []],
+    ],
+  },
 };
 
 console.log(JSON.stringify(testMap));
@@ -22,7 +47,6 @@ console.log(JSON.stringify(testMap));
 const Scene = () => {
   const cameraControls = useRef<CameraControls>(null);
   const [, get] = useKeyboardControls();
-  const ref = useRef()
 
   useFrame(() => {
     if (cameraControls.current) {
@@ -44,16 +68,6 @@ const Scene = () => {
     <Fragment>
       <CameraControls ref={cameraControls} />
 
-      <ambientLight intensity={0.3} />
-      <spotLight
-        position={[10, 10, 10]}
-        angle={0.15}
-        penumbra={1}
-        decay={0}
-        intensity={0.6}
-      />
-      <pointLight position={[0, 10, 0]} decay={0.3} intensity={0.5} />
-
       {testMap.blocks.map((arrayx, ix) =>
         arrayx.map((arrayy, iy) =>
           arrayy.map((block, iz) => (
@@ -61,12 +75,22 @@ const Scene = () => {
               key={`${ix}${iy}${iz}`}
               startingPosition={new THREE.Vector3(ix, iy, iz)}
               height={block.height}
+              visible={iz % 2 > 0}
             />
           ))
         )
       )}
 
-      <Actor />
+      <mesh position={new THREE.Vector3(0, 1, 0.5)}>
+        <boxGeometry args={[1, 1, 0.1]} />
+        <meshBasicMaterial color={"red"} />
+      </mesh>
+      <mesh position={new THREE.Vector3(0, 2, 0.5)}>
+        <boxGeometry args={[1, 1, 0.1]} />
+        <meshBasicMaterial color={"red"} />
+      </mesh>
+
+      <Actor startingPosition={new THREE.Vector3(1, 1.5, 1)} />
     </Fragment>
   );
 };

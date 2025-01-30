@@ -1,21 +1,29 @@
 import { useTexture } from "@react-three/drei";
 import { useCallback, useState } from "react";
 import * as THREE from "three";
+import { useDebounce } from "@uidotdev/usehooks";
 
 type BlockProps = {
   startingPosition: THREE.Vector3;
   height?: number;
   msg?: string;
   magFilter?: THREE.MagnificationTextureFilter;
+  visible?: boolean;
 };
+
+const BLOCK_SIZE = 1;
+const OUTLINE_MARGIN = 0.05;
 
 const Block = ({
   startingPosition,
   height = 3,
   msg,
   magFilter = THREE.NearestFilter,
+  visible = true,
 }: BlockProps) => {
   const [hovered, setHovered] = useState(false);
+
+  const debouncedHovered = useDebounce(hovered, 50);
 
   const topTexture = useTexture("sand_top.png");
   const sideTexture = useTexture("sand_side.png");
@@ -23,6 +31,7 @@ const Block = ({
   //no blur
   topTexture.magFilter = magFilter;
   sideTexture.magFilter = magFilter;
+  outlineTexture.magFilter = magFilter;
 
   const handleMouseOn = useCallback(() => {
     setHovered(true);
@@ -50,18 +59,50 @@ const Block = ({
           e.stopPropagation();
         }}
       >
-        <boxGeometry args={[1, height / 3, 1]} />
+        <boxGeometry args={[BLOCK_SIZE, height / 3, BLOCK_SIZE]} />
 
-        <meshBasicMaterial attach={"material-2"} map={topTexture} />
-        <meshBasicMaterial attach={"material-3"} map={sideTexture} />
-        <meshBasicMaterial attach={"material-0"} map={sideTexture} />
-        <meshBasicMaterial attach={"material-1"} map={sideTexture} />
-        <meshBasicMaterial attach={"material-4"} map={sideTexture} />
-        <meshBasicMaterial attach={"material-5"} map={sideTexture} />
+        {/* meshBasicMaterial is not affected by light, meshStandardMaterial is */}
+        <meshBasicMaterial
+          attach={"material-2"}
+          map={topTexture}
+          color={visible ? "white" : "gray"}
+        />
+        <meshBasicMaterial
+          attach={"material-3"}
+          map={sideTexture}
+          color={visible ? "white" : "gray"}
+        />
+        <meshBasicMaterial
+          attach={"material-0"}
+          map={sideTexture}
+          color={visible ? "white" : "gray"}
+        />
+        <meshBasicMaterial
+          attach={"material-1"}
+          map={sideTexture}
+          color={visible ? "white" : "gray"}
+        />
+        <meshBasicMaterial
+          attach={"material-4"}
+          map={sideTexture}
+          color={visible ? "white" : "gray"}
+        />
+        <meshBasicMaterial
+          attach={"material-5"}
+          map={sideTexture}
+          color={visible ? "white" : "gray"}
+        />
       </mesh>
-      {hovered && (
+
+      {debouncedHovered && (
         <mesh position={startingPosition}>
-          <boxGeometry args={[1.05, height / 3 + 0.05, 1.05]} />
+          <boxGeometry
+            args={[
+              BLOCK_SIZE + OUTLINE_MARGIN,
+              height / 3 + OUTLINE_MARGIN,
+              BLOCK_SIZE + OUTLINE_MARGIN,
+            ]}
+          />
           <meshBasicMaterial map={outlineTexture} transparent={true} />
         </mesh>
       )}
