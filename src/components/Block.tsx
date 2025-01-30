@@ -11,8 +11,8 @@ type BlockProps = {
   visible?: boolean;
 };
 
-const BLOCK_SIZE = 1;
-const OUTLINE_MARGIN = 0.05;
+const BLOCK_SIZE = 10;
+const OUTLINE_MARGIN = 0.1;
 
 const Block = ({
   startingPosition,
@@ -59,7 +59,7 @@ const Block = ({
           e.stopPropagation();
         }}
       >
-        <boxGeometry args={[BLOCK_SIZE, height / 3, BLOCK_SIZE]} />
+        <boxGeometry args={[BLOCK_SIZE, height / 0.3, BLOCK_SIZE]} />
 
         {/* meshBasicMaterial is not affected by light, meshStandardMaterial is */}
         <meshBasicMaterial
@@ -99,7 +99,7 @@ const Block = ({
           <boxGeometry
             args={[
               BLOCK_SIZE + OUTLINE_MARGIN,
-              height / 3 + OUTLINE_MARGIN,
+              height / 0.3 + OUTLINE_MARGIN,
               BLOCK_SIZE + OUTLINE_MARGIN,
             ]}
           />
