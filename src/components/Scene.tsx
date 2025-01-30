@@ -5,7 +5,7 @@ import Actor from "./Actor";
 import * as THREE from "three";
 import Block from "./Block";
 
-const GAMEPIECE_MODE_POLAR_ANGLE = 0.3;
+const GAMEPIECE_MODE_DEGREES = 170;
 
 const block = {
   height: 3,
@@ -45,34 +45,33 @@ const testMap = {
 };
 
 const Scene = () => {
+  
   const cameraControls = useRef<CameraControls>(null);
   const [showActorGamepiece, setShowActorGamepiece] = useState(false);
   //checks camera twice per second to switch actors into game piece mode,
   // not an ideal solution but best I can do :/
+
   useEffect(() => {
     const interval = setInterval(() => {
-      if (
-        !showActorGamepiece &&
-        cameraControls?.current?.polarAngle &&
-        cameraControls.current.polarAngle < GAMEPIECE_MODE_POLAR_ANGLE
-      ) {
+      const camAngleDegrees =
+        (cameraControls?.current?.polarAngle || 0 / -Math.PI) * 180 + 90;
+      
+      if (!showActorGamepiece && camAngleDegrees < GAMEPIECE_MODE_DEGREES) {
         setShowActorGamepiece(true);
       } else if (
         showActorGamepiece &&
-        cameraControls?.current?.polarAngle &&
-        cameraControls.current.polarAngle >= GAMEPIECE_MODE_POLAR_ANGLE
+        camAngleDegrees >= GAMEPIECE_MODE_DEGREES
       ) {
         setShowActorGamepiece(false);
       }
     }, 200);
+
     return () => clearInterval(interval);
   }, [showActorGamepiece]);
 
   const [, get] = useKeyboardControls();
 
-
   useFrame(() => {
-   
     if (cameraControls.current) {
       if (get().forward) {
         cameraControls.current.truck(0, -0.3, true);
