@@ -6,6 +6,7 @@ import * as THREE from "three";
 import Block from "./Block";
 
 const GAMEPIECE_MODE_DEGREES = 180;
+const CAMERA_MOVE_SPEED = 2;
 
 const block = {
   height: 3,
@@ -53,7 +54,7 @@ const Scene = () => {
   useThree(({ camera }) => {
     camera.position.y = 50;
     camera.position.x = -50;
-    camera.position.z = 70;
+    camera.position.z = -70;
 
     camera.lookAt(0, 0, 0);
   });
@@ -83,16 +84,16 @@ const Scene = () => {
 
       //camera controls
       if (get().forward) {
-        cameraControls.current.truck(0, -0.3, true);
+        cameraControls.current.truck(0, -CAMERA_MOVE_SPEED, true);
       }
       if (get().back) {
-        cameraControls.current.truck(0, 0.3, true);
+        cameraControls.current.truck(0, CAMERA_MOVE_SPEED, true);
       }
       if (get().left) {
-        cameraControls.current.truck(-0.3, 0, true);
+        cameraControls.current.truck(-CAMERA_MOVE_SPEED, 0, true);
       }
       if (get().right) {
-        cameraControls.current.truck(0.3, 0, true);
+        cameraControls.current.truck(CAMERA_MOVE_SPEED, 0, true);
       }
     }
   });
@@ -125,7 +126,7 @@ const Scene = () => {
       <Actor
         startingPosition={new THREE.Vector3(10, 15, 10)}
         showGamepiece={showGamepieces}
-        facing={Facing.east}
+        facing={Facing.south}
       />
       {/* <Actor
         startingPosition={new THREE.Vector3(10, 15, 20)}

@@ -1,6 +1,6 @@
 import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import * as THREE from "three";
 
 const DEFAULT_STANDING_SIZE = new THREE.Vector3(10, 20, 10);
@@ -16,11 +16,12 @@ export enum Facing {
   west = "west",
 }
 
+//North is x > 1, z = 0
 const facingZRotation = {
-  north: Math.PI,
-  south: 0,
-  east: Math.PI / 2,
-  west: -Math.PI / 2,
+  north: 0,
+  south: Math.PI,
+  east: -Math.PI / 2,
+  west: Math.PI / 2,
 };
 
 type ActorProps = {

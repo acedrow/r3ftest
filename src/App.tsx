@@ -35,7 +35,6 @@ function App() {
       <div style={{ width: "90vw", height: "90vh" }}>
         <Canvas>
           <color attach="background" args={["black"]} />
-
           <Stars
             radius={100}
             depth={50}
