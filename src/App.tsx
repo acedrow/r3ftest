@@ -14,7 +14,7 @@ enum Controls {
   left = "left",
   right = "right",
   jump = "jump",
-  l = 'l'
+  l = "l",
 }
 
 function App() {
@@ -35,6 +35,7 @@ function App() {
       <div style={{ width: "90vw", height: "90vh" }}>
         <Canvas>
           <color attach="background" args={["black"]} />
+          <axesHelper args={[100]} />
           <Stars
             radius={100}
             depth={50}

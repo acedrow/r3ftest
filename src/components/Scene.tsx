@@ -1,18 +1,26 @@
 import { CameraControls, useKeyboardControls } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Fragment, useEffect, useRef, useState } from "react";
-import Actor, { Facing } from "./Actor";
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import Actor from "./Actor";
 import * as THREE from "three";
 import Block from "./Block";
+import parseMapData from "../utils/parseMapData";
+import {
+  Facing,
+  MapData,
+  SerializedBlockData,
+  SerializedMapData,
+} from "../types/MapTypes";
 
-const GAMEPIECE_MODE_DEGREES = 180;
-const CAMERA_MOVE_SPEED = 2;
-
-const block = {
-  height: 3,
+const block: SerializedBlockData = {
+  terrainHeight: 3,
+};
+const wall = {
+  height: 6,
 };
 
-const testMap = {
+const testMap: SerializedMapData = {
+  bounds: new THREE.Vector3(5, 5, 5),
   blocks: [
     [[block, block, block, block, block], [], [], [], []],
     [[block, block, block, block, block], [], [], [], []],
@@ -36,7 +44,7 @@ const testMap = {
       [[], [], [], [], []],
     ],
     z: [
-      [[], [], [], [], []],
+      [[undefined, wall], [], [], [], []],
       [[], [], [], [], []],
       [[], [], [], [], []],
       [[], [], [], [], []],
@@ -45,10 +53,14 @@ const testMap = {
   },
 };
 
+const GAMEPIECE_MODE_DEGREES = 180;
+const CAMERA_MOVE_SPEED = 2;
+
 const Scene = () => {
   const cameraControls = useRef<CameraControls>(null);
   const cameraAngleLock = useRef<boolean>(false);
   const [showGamepieces, setShowGamepieces] = useState(false);
+  const gameMap: MapData = parseMapData(testMap);
 
   //sets default camera position
   useThree(({ camera }) => {
@@ -101,15 +113,12 @@ const Scene = () => {
     <Fragment>
       <CameraControls ref={cameraControls} />
 
-      {testMap.blocks.map((arrayx, ix) =>
+      {gameMap.blocks.map((arrayx, ix) =>
         arrayx.map((arrayy, iy) =>
           arrayy.map((block, iz) => (
-            <Block
-              key={`${ix}${iy}${iz}`}
-              startingPosition={new THREE.Vector3(ix * 10, iy * 10, iz * 10)}
-              height={block.height}
-              visible={iz % 2 > 0}
-            />
+            <React.Fragment key={`${ix}${iy}${iz}`}>
+              {block && <Block key={`${ix}${iy}${iz}`} data={block} />}
+            </React.Fragment>
           ))
         )
       )}
@@ -126,7 +135,7 @@ const Scene = () => {
       <Actor
         startingPosition={new THREE.Vector3(10, 15, 10)}
         showGamepiece={showGamepieces}
-        facing={Facing.south}
+        facing={Facing.north}
       />
       {/* <Actor
         startingPosition={new THREE.Vector3(10, 15, 20)}

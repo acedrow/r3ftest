@@ -2,11 +2,10 @@ import { useTexture } from "@react-three/drei";
 import { useCallback, useState } from "react";
 import * as THREE from "three";
 import { useDebounce } from "@uidotdev/usehooks";
+import { BlockData } from "../types/MapTypes";
 
 type BlockProps = {
-  startingPosition: THREE.Vector3;
-  height?: number;
-  msg?: string;
+  data: BlockData;
   magFilter?: THREE.MagnificationTextureFilter;
   visible?: boolean;
 };
@@ -14,13 +13,8 @@ type BlockProps = {
 const BLOCK_SIZE = 10;
 const OUTLINE_MARGIN = 0.1;
 
-const Block = ({
-  startingPosition,
-  height = 3,
-  msg,
-  magFilter = THREE.NearestFilter,
-  visible = true,
-}: BlockProps) => {
+const Block = ({ data, visible = true }: BlockProps) => {
+  const { terrainHeight, coordinates } = data || {terrainHeight: 3, };
   const [hovered, setHovered] = useState(false);
 
   const debouncedHovered = useDebounce(hovered, 50);
@@ -28,10 +22,11 @@ const Block = ({
   const topTexture = useTexture("sand_top.png");
   const sideTexture = useTexture("sand_side.png");
   const outlineTexture = useTexture("cube-outline.png");
+
   //no blur
-  topTexture.magFilter = magFilter;
-  sideTexture.magFilter = magFilter;
-  outlineTexture.magFilter = magFilter;
+  topTexture.magFilter = THREE.NearestFilter;
+  sideTexture.magFilter = THREE.NearestFilter;
+  outlineTexture.magFilter = THREE.NearestFilter;
 
   const handleMouseOn = useCallback(() => {
     setHovered(true);
@@ -44,7 +39,13 @@ const Block = ({
   return (
     <>
       <mesh
-        position={startingPosition}
+        position={
+          new THREE.Vector3(
+            coordinates.x * 10,
+            coordinates.y * 10,
+            coordinates.z * 10
+          )
+        }
         onPointerEnter={(e) => {
           handleMouseOn();
           e.stopPropagation();
@@ -54,14 +55,17 @@ const Block = ({
           e.stopPropagation();
         }}
         onClick={(e) => {
-          console.log(msg ?? "no msg");
+          console.log(`hi I'm ${data.coordinates.x}, ${data.coordinates.y}, ${data.coordinates.z}`);
+          console.log(`my neighbors are:`);
+          console.log(data.neighbors)
           //use stopPropagation to only react to closest ray intersection, not all objects.
           e.stopPropagation();
         }}
       >
-        <boxGeometry args={[BLOCK_SIZE, height / 0.3, BLOCK_SIZE]} />
+        <boxGeometry args={[BLOCK_SIZE, terrainHeight / 0.3, BLOCK_SIZE]} />
 
         {/* meshBasicMaterial is not affected by light, meshStandardMaterial is */}
+        {/* TODO: once we have coordinates and boundaries in here, need to only render the necessary sides - e.g. don't render any sides for internal blocks */}
         <meshBasicMaterial
           attach={"material-2"}
           map={topTexture}
@@ -95,11 +99,19 @@ const Block = ({
       </mesh>
 
       {debouncedHovered && (
-        <mesh position={startingPosition}>
+        <mesh
+          position={
+            new THREE.Vector3(
+              coordinates.x * 10,
+              coordinates.y * 10,
+              coordinates.z * 10
+            )
+          }
+        >
           <boxGeometry
             args={[
               BLOCK_SIZE + OUTLINE_MARGIN,
-              height / 0.3 + OUTLINE_MARGIN,
+              terrainHeight / 0.3 + OUTLINE_MARGIN,
               BLOCK_SIZE + OUTLINE_MARGIN,
             ]}
           />

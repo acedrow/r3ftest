@@ -2,21 +2,15 @@ import { useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
+import { Facing } from "../types/MapTypes";
 
 const DEFAULT_STANDING_SIZE = new THREE.Vector3(10, 20, 10);
 const DEFAULT_PIECE_SIZE = new THREE.Vector3(10, 10, 1);
 
-const FACING_INDICATOR_HEIGHT = 5.5;
-const GAMEPIECE_HEIGHT = 5.1;
+const FACING_INDICATOR_HEIGHT = 5;
+const GAMEPIECE_HEIGHT = 5.5;
 
-export enum Facing {
-  north = "north",
-  south = "south",
-  east = "east",
-  west = "west",
-}
-
-//North is x > 1, z = 0
+//North is Z > 1, X = 0
 const facingZRotation = {
   north: 0,
   south: Math.PI,
