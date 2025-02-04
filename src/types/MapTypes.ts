@@ -7,9 +7,15 @@ export enum Facing {
   west = "west",
 }
 
+export enum TerrainType {
+  air = 'air',
+  sand = "sand",
+}
+
 
 //Data types representing blocks in serialized JSON object
 export type SerializedBlockData = {
+  terrainType: TerrainType,
   terrainHeight: number;
 };
 export type SerializedEdgeData = {
@@ -34,6 +40,7 @@ export type EdgeData = {
 
 export type BlockData = {
   coordinates: THREE.Vector3
+  terrainType: TerrainType,
   terrainHeight: number;
   neighbors: {
     n: BlockData | undefined;

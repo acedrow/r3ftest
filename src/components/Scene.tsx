@@ -10,10 +10,12 @@ import {
   MapData,
   SerializedBlockData,
   SerializedMapData,
+  TerrainType,
 } from "../types/MapTypes";
 
 const block: SerializedBlockData = {
   terrainHeight: 3,
+  terrainType: TerrainType.sand
 };
 const wall = {
   height: 6,

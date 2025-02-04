@@ -4,48 +4,9 @@ import {
   BlockData,
   SerializedMapData,
   MapData,
+  TerrainType,
 } from "../types/MapTypes";
 
-const block: SerializedBlockData = {
-  terrainHeight: 3,
-};
-const wall = {
-  height: 6,
-};
-
-export const testMap: SerializedMapData = {
-  bounds: new THREE.Vector3(5, 5, 5),
-  blocks: [
-    [[block, block, block, block, block], [], [], [], []],
-    [[block, block, block, block, block], [], [], [], []],
-    [[block, block, block, block, block], [], [], [], []],
-    [[block, block, block, block, block], [], [], [], []],
-    [[block, block, block, block, block], [], [], [], []],
-  ],
-  edges: {
-    x: [
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-    ],
-    y: [
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-    ],
-    z: [
-      [[undefined, wall], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-      [[], [], [], [], []],
-    ],
-  },
-};
 
 //de-serialize JSON map data into MapData objects
 const deserializeBlockData = (
@@ -54,6 +15,7 @@ const deserializeBlockData = (
 ): BlockData => {
   return {
     coordinates: coordinates,
+    terrainType: block?.terrainType || TerrainType.air,
     terrainHeight: block?.terrainHeight || 3,
     neighbors: {
       n: undefined,
@@ -127,7 +89,8 @@ const populateNeighbors = (
           ]
         : undefined,
     nw:
-      block.coordinates.z < mapBounds.z - 1 && block.coordinates.x < mapBounds.x - 1
+      block.coordinates.z < mapBounds.z - 1 &&
+      block.coordinates.x < mapBounds.x - 1
         ? blocks[block.coordinates.x][block.coordinates.y][
             block.coordinates.z + 1
           ]
@@ -152,13 +115,32 @@ const parseMapData = (mapData: SerializedMapData): MapData => {
   if (!mapData) {
     throw new Error(`failed to parse map data - mapData is ${mapData}`);
   }
-  const blocks = mapData.blocks.map((mapDataX, ix) =>
-    mapDataX.map((mapDataY, iy) =>
-      mapDataY.map((blockdata, iz) =>
-        deserializeBlockData(blockdata, new THREE.Vector3(ix, iy, iz))
-      )
-    )
-  );
+  if (
+    mapData.blocks.length > mapData.bounds.x ||
+    mapData.blocks[0].length > mapData.bounds.y ||
+    mapData.blocks[0][0].length > mapData.bounds.y
+  ) {
+    throw new Error(`failed to parse map data, blocks size exceeds bounds`);
+  }
+
+  const blocks: BlockData[][][] = [[[]]];
+
+  for (let mapx = 0; mapx < mapData.bounds.x; mapx++) {
+    if (!blocks[mapx]) {
+      blocks[mapx] = []
+    }
+    for (let mapy = 0; mapy < mapData.bounds.y; mapy++) {
+      if (!blocks[mapx][mapy]) {
+        blocks[mapx][mapy] = []
+      }
+      for (let mapz = 0; mapz < mapData.bounds.z; mapz++) {
+        blocks[mapx][mapy].push(deserializeBlockData(
+          mapData.blocks[mapx][mapy][mapz],
+          new THREE.Vector3(mapx, mapy, mapz)
+        ));
+      }
+    }
+  }
 
   blocks.map((blocksX) =>
     blocksX.map((blocksY) =>
