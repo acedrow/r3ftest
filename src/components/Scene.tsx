@@ -13,9 +13,13 @@ import {
   TerrainType,
 } from "../types/MapTypes";
 
+const MIN_CAMERA_DISTANCE = 30;
+const MAX_CAMERA_DISTANCE = 150;
+const MAX_CAMERA_POLAR_ANGLE = Math.PI / 2;
+
 const block: SerializedBlockData = {
   terrainHeight: 3,
-  terrainType: TerrainType.sand
+  terrainType: TerrainType.sand,
 };
 const wall = {
   height: 6,
@@ -72,6 +76,13 @@ const Scene = () => {
 
     camera.lookAt(0, 0, 0);
   });
+
+  useEffect(() => {
+    if (cameraControls.current) {
+      cameraControls.current.maxPolarAngle = Math.PI / 2;
+    }
+  }, []);
+
   //checks camera twice per second to switch actors into game piece mode,
   // not an ideal solution but best I can do :/
   useEffect(() => {
@@ -113,7 +124,12 @@ const Scene = () => {
   });
   return (
     <Fragment>
-      <CameraControls ref={cameraControls} />
+      <CameraControls
+        ref={cameraControls}
+        maxDistance={MAX_CAMERA_DISTANCE}
+        minDistance={MIN_CAMERA_DISTANCE}
+        maxPolarAngle={MAX_CAMERA_POLAR_ANGLE}
+      />
 
       {gameMap.blocks.map((arrayx, ix) =>
         arrayx.map((arrayy, iy) =>
@@ -139,26 +155,6 @@ const Scene = () => {
         showGamepiece={showGamepieces}
         facing={Facing.north}
       />
-      {/* <Actor
-        startingPosition={new THREE.Vector3(10, 15, 20)}
-        showGamepiece={showGamepieces}
-        facing={Facing.west}
-      />
-      <Actor
-        startingPosition={new THREE.Vector3(20, 15, 10)}
-        showGamepiece={showGamepieces}
-        facing={Facing.east}
-      />
-      <Actor
-        startingPosition={new THREE.Vector3(10, 15, 30)}
-        showGamepiece={showGamepieces}
-        facing={Facing.north}
-      />
-      <Actor
-        startingPosition={new THREE.Vector3(30, 15, 10)}
-        showGamepiece={showGamepieces}
-        facing={Facing.south}
-      /> */}
     </Fragment>
   );
 };
