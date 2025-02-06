@@ -103,22 +103,24 @@ const Scene = () => {
   const [, get] = useKeyboardControls();
 
   //Control bindings
-  useFrame(() => {
+  useFrame(({ camera }) => {
     if (cameraControls.current) {
       cameraControls.current.enabled = !cameraAngleLock.current;
 
       //camera controls
       if (get().forward) {
-        cameraControls.current.truck(0, -CAMERA_MOVE_SPEED, true);
+        cameraControls.current.truck(0, -CAMERA_MOVE_SPEED, false);
       }
       if (get().back) {
-        cameraControls.current.truck(0, CAMERA_MOVE_SPEED, true);
+        if (camera.position.y > 0) {
+          cameraControls.current.truck(0, CAMERA_MOVE_SPEED, false);
+        }
       }
       if (get().left) {
-        cameraControls.current.truck(-CAMERA_MOVE_SPEED, 0, true);
+        cameraControls.current.truck(-CAMERA_MOVE_SPEED, 0, false);
       }
       if (get().right) {
-        cameraControls.current.truck(CAMERA_MOVE_SPEED, 0, true);
+        cameraControls.current.truck(CAMERA_MOVE_SPEED, 0, false);
       }
     }
   });
